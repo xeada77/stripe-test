@@ -4,10 +4,51 @@ import { CardElement, useStripe, useElements } from "@stripe/react-stripe-js";
 const Card = () => {
   const stripe = useStripe();
   const elements = useElements();
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     console.log("Submit");
+
+    if (!stripe || !elements) {
+      console.log("Stripe.js aun no se ha cargado!");
+      return;
+    }
+
+    const { error: backendError, clientSecret } = await fetch(
+      "http://localhost:5001/api/v1/checkout/create-payment-intent",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          paymentMethodType: "card",
+          currency: "eur",
+        }),
+      }
+    ).then((res) => res.json());
+
+    if (backendError) {
+      console.log(backendError.message);
+      return;
+    }
+
+    const { error: stripeError, paymentIntent } =
+      await stripe.confirmCardPayment(clientSecret, {
+        payment_method: {
+          card: elements.getElement(CardElement),
+          billing_details: {
+            name: "Jhon Dow",
+          },
+        },
+      });
+
+    if (stripeError) {
+      console.log(stripeError.message);
+      return;
+    }
+
+    console.log(`Pago ${paymentIntent.status}: ${paymentIntent.id}`);
   };
   return (
     <>
