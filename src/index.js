@@ -1,17 +1,22 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import './index.css';
-import App from './App';
-import reportWebVitals from './reportWebVitals';
+import React from "react";
+import ReactDOM from "react-dom";
+import App from "./App";
+import { Elements } from "@stripe/react-stripe-js";
+import { loadStripe } from "@stripe/stripe-js";
 
-ReactDOM.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>,
-  document.getElementById('root')
-);
+document.addEventListener("DOMContentLoaded", async () => {
+  const { publicKey } = await fetch(
+    "http://localhost:5001/api/v1/config/"
+  ).then((r) => r.json());
+  console.log(publicKey);
+  const stripePromise = loadStripe(publicKey);
 
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-reportWebVitals();
+  ReactDOM.render(
+    <React.StrictMode>
+      <Elements stripe={stripePromise}>
+        <App />
+      </Elements>
+    </React.StrictMode>,
+    document.getElementById("root")
+  );
+});
