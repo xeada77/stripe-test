@@ -24,6 +24,7 @@ const Card = () => {
         body: JSON.stringify({
           paymentMethodType: "card",
           currency: "eur",
+          amount: 4990,
         }),
       }
     ).then((res) => res.json());

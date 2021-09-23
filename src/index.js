@@ -8,7 +8,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   const { publicKey } = await fetch(
     "http://localhost:5001/api/v1/config/"
   ).then((r) => r.json());
-  console.log(publicKey);
   const stripePromise = loadStripe(publicKey);
 
   ReactDOM.render(
